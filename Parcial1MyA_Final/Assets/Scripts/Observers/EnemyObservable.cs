@@ -6,6 +6,7 @@ public class EnemyObservable : MonoBehaviour, IObservable
 {
     List<IObserver> _allObserver = new List<IObserver>();
 
+    //Deprecated
     void Start()
     {
         EventManager.SubscribeToEvent(EventManager.EventsType.Event_Enemy_Destroy, Event_Enemy_Destroy);

@@ -7,6 +7,11 @@ public class LinealBulletMove : IBulletMove
     private Transform transform;
     private float speed;
 
+    public LinealBulletMove(float speed)
+    {
+        this.speed = speed;
+
+    }
     public LinealBulletMove(Transform transform, float speed)
     {
         this.transform = transform;
@@ -16,5 +21,15 @@ public class LinealBulletMove : IBulletMove
     public void Move()
     {
         transform.position += transform.right * speed * Time.deltaTime;
+    }
+
+    public void SetSpeed(float speed)
+    {
+        this.speed = speed;
+    }
+
+    public void SetTransform(Transform transform)
+    {
+        this.transform = transform;
     }
 }

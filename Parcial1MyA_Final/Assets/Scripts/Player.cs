@@ -12,7 +12,8 @@ public class Player : MonoBehaviour, IObserver
     public ObjectPool<Bullet> pool;
 
     public IBulletMove currentBulletMove;
-    private BulletMove currentEnumBulletMove;
+    private IBulletMove linealBulletMove;
+    private IBulletMove sinusoidalBulletMove;
 
     Camera _myCamera;
     bool _canShoot;
@@ -23,7 +24,9 @@ public class Player : MonoBehaviour, IObserver
     void Start()
     {
         pool = new ObjectPool<Bullet>(BulletFactory, Bullet.TurnOn, Bullet.TurnOff);
-        currentEnumBulletMove = BulletMove.lineal;
+
+        linealBulletMove = new LinealBulletMove(speed);
+        sinusoidalBulletMove = new SinusoidalBulletMove();
 
         _myCamera = Camera.main;
         _canShoot = true;
@@ -48,12 +51,12 @@ public class Player : MonoBehaviour, IObserver
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            currentEnumBulletMove = BulletMove.lineal;
+            currentBulletMove = linealBulletMove;
         }
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            currentEnumBulletMove = BulletMove.Sinusoidal;
+            currentBulletMove = sinusoidalBulletMove;
         }
     }
 
@@ -73,11 +76,6 @@ public class Player : MonoBehaviour, IObserver
         b.transform.position = pointToSpawn.position;
         b.transform.rotation = transform.rotation;
         b.timeToDie = shootCooldown;
-
-        currentBulletMove = new LinealBulletMove(b.transform, b.speed);
-        if (currentEnumBulletMove == BulletMove.Sinusoidal)
-            currentBulletMove = new SinusoidalBulletMove(b.transform, b.speed);
-
 
         b.SetCurrentBulletMove(currentBulletMove);
 

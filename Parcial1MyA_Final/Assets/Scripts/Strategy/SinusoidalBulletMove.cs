@@ -8,11 +8,16 @@ public class SinusoidalBulletMove : IBulletMove
     private float speed;
     private Vector3 pos;
 
-    public float frequency = 20.0f;  
-    public float magnitude = 0.5f;   
+    public float frequency = 20.0f;
+    public float magnitude = 0.5f;
     private Vector3 axis;
 
-
+    public SinusoidalBulletMove(float speed)
+    {
+        this.speed = speed;
+        pos = transform.position;
+        axis = transform.up;
+    }
     public SinusoidalBulletMove(Transform transform, float speed)
     {
         this.transform = transform;
@@ -31,5 +36,15 @@ public class SinusoidalBulletMove : IBulletMove
         transform.position = pos + axis * Mathf.Sin(Time.time * frequency) * magnitude;
 
         //this.transform.position = transform.position + new Vector3(0, Mathf.Sin(Time.time * speed), speed * Time.deltaTime);
+    }
+
+    public void SetTransform(Transform transform)
+    {
+        this.transform = transform;
+    }
+
+    public void SetSpeed(float speed)
+    {
+        this.speed = speed;
     }
 }

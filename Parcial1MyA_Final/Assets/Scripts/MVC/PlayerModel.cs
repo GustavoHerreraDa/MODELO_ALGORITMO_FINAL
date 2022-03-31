@@ -6,9 +6,10 @@ public class PlayerModel : MonoBehaviour, IObserver
 {
     public float speed = 10;
     public float shootCooldown;
-    public ObjectPool<Bullet> pool;
     public IBulletMove currentBulletMove;
-    private BulletMove currentEnumBulletMove;
+    public IBulletMove linealBulletMove;
+    public IBulletMove sinusoidalBulletMove;
+
 
     private PlayerController controller;
     public Bullet bulletPrefab;
@@ -29,8 +30,6 @@ public class PlayerModel : MonoBehaviour, IObserver
     // Start is called before the first frame update
     void Start()
     {
-        pool = new ObjectPool<Bullet>(BulletFactory, Bullet.TurnOn, Bullet.TurnOff, 5, true);
-        currentEnumBulletMove = BulletMove.lineal;
         _myCamera = Camera.main;
         controller = new PlayerController(this, GetComponentInChildren<PlayerView>());
         _canShoot = true;
@@ -44,12 +43,12 @@ public class PlayerModel : MonoBehaviour, IObserver
 
     public void ChangeLineal()
     {
-        currentEnumBulletMove = BulletMove.lineal;
+        currentBulletMove = linealBulletMove;
     }
 
     public void ChangeSinusoidal()
     {
-        currentEnumBulletMove = BulletMove.Sinusoidal;
+        currentBulletMove = sinusoidalBulletMove;
     }
 
     public void Shoot()
@@ -57,19 +56,19 @@ public class PlayerModel : MonoBehaviour, IObserver
         if (_canShoot)
         {
 
-            var b = pool.GetObject();
-            b.gameObject.GetComponent<BulletObservable>().Subscribe(this);
-            b.transform.position = pointToSpawn.position;
-            b.transform.rotation = transform.rotation;
-            b.timeToDie = shootCooldown;
+            var bullet = BulletSpawner.Instance.pool.GetObject();
+            bullet.gameObject.GetComponent<BulletObservable>().Subscribe(this);
+            bullet.transform.position = pointToSpawn.position;
+            bullet.transform.rotation = transform.rotation;
+            bullet.timeToDie = shootCooldown;
 
-            currentBulletMove = new LinealBulletMove(b.transform, b.speed);
-            if (currentEnumBulletMove == BulletMove.Sinusoidal)
-                currentBulletMove = new SinusoidalBulletMove(b.transform, b.speed);
+            currentBulletMove.SetTransform(bullet.transform);
+            currentBulletMove.SetSpeed(bullet.speed);
 
-            b.SetCurrentBulletMove(currentBulletMove);
 
-            b.owner = this;
+            bullet.SetCurrentBulletMove(currentBulletMove);
+
+            bullet.owner = this;
             _shootCDCor = StartCoroutine(ShootCooldown());
 
             shoot();
@@ -103,17 +102,7 @@ public class PlayerModel : MonoBehaviour, IObserver
             StartCoroutine(WaitOnSecond());
         }
     }
-
-    public Bullet BulletFactory()
-    {
-        return Instantiate(bulletPrefab);
-    }
-
-    public void ReturnBullet(Bullet b)
-    {
-        pool.ReturnObject(b);
-    }
-
+    
     public void Notify(string action)
     {
         if (action == "Event_Bullet_Hit")

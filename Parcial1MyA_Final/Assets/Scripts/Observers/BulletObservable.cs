@@ -5,6 +5,7 @@ public class BulletObservable : MonoBehaviour, IObservable
 {
     List<IObserver> _allObserver = new List<IObserver>();
 
+    //Deprecated
     void Start()
     {
         EventManager.SubscribeToEvent(EventManager.EventsType.Event_Bullet_Hit, Bullet_Hit);
